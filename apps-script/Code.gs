@@ -73,8 +73,14 @@ function doPost(e) {
       submissionId,
     ];
 
-    sheet.appendRow(row);
-    return jsonResponse({ ok: true, duplicate: false, submission_id: submissionId });
+    appendTextSafeRow(sheet, row);
+    return jsonResponse({
+      ok: true,
+      duplicate: false,
+      submission_id: submissionId,
+      spreadsheet_id: SPREADSHEET_ID,
+      sheet_name: SHEET_NAME,
+    });
   } catch (error) {
     return jsonResponse({ ok: false, error: String(error && error.message ? error.message : error) });
   } finally {
@@ -83,7 +89,13 @@ function doPost(e) {
 }
 
 function doGet() {
-  return jsonResponse({ ok: true, message: 'Seat survey endpoint is running.' });
+  return jsonResponse({
+    ok: true,
+    message: 'Seat survey endpoint is running.',
+    spreadsheet_id: SPREADSHEET_ID,
+    sheet_name: SHEET_NAME,
+    spreadsheet_url: 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/edit',
+  });
 }
 
 function parsePayload(e) {
@@ -119,7 +131,6 @@ function validatePayload(payload) {
 
   const phoneNormalized = normalizePhone(payload.phoneNormalized || payload.phone);
   if (phoneNormalized.length < 10) return 'invalid_phone';
-  if (!['1학년', '2학년', '3학년'].includes(String(payload.grade))) return 'invalid_grade';
 
   const focusScore = Number(payload.focusScore);
   if (!Number.isInteger(focusScore) || focusScore < 1 || focusScore > 5) return 'invalid_focus_score';
@@ -150,13 +161,27 @@ function ensureHeaders(sheet) {
   if (isEmpty) sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
 }
 
+function appendTextSafeRow(sheet, row) {
+  const nextRow = Math.max(sheet.getLastRow() + 1, 2);
+  const phoneColumn = HEADERS.indexOf('phone') + 1;
+  const phoneNormalizedColumn = HEADERS.indexOf('phone_normalized') + 1;
+  sheet.getRange(nextRow, phoneColumn, 1, 1).setNumberFormat('@');
+  sheet.getRange(nextRow, phoneNormalizedColumn, 1, 1).setNumberFormat('@');
+  sheet.getRange(nextRow, 1, 1, HEADERS.length).setValues([row]);
+}
+
 function hasDuplicatePhone(sheet, phoneNormalized) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return false;
 
   const phoneColumn = HEADERS.indexOf('phone_normalized') + 1;
-  const values = sheet.getRange(2, phoneColumn, lastRow - 1, 1).getValues();
-  return values.some((row) => normalizePhone(row[0]) === phoneNormalized);
+  const values = sheet.getRange(2, phoneColumn, lastRow - 1, 1).getDisplayValues();
+  const withoutLeadingZero = phoneNormalized.replace(/^0+/, '');
+
+  return values.some((row) => {
+    const existing = normalizePhone(row[0]);
+    return existing === phoneNormalized || existing === withoutLeadingZero || '0' + existing === phoneNormalized;
+  });
 }
 
 function hasUniqueValues(values) {
