@@ -1,3 +1,4 @@
+const SPREADSHEET_ID = '15JTTxdZCHaMpE0208J8-u8Z4djbqDahcJqWAhNw4F_8';
 const SHEET_NAME = 'responses';
 
 const HEADERS = [
@@ -132,7 +133,7 @@ function validatePayload(payload) {
 }
 
 function getResponseSheet() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
   return sheet;
