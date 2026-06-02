@@ -32,6 +32,7 @@
   window.showSeatSurveyComplete = showComplete;
 
   injectGradeButtonStyles();
+  injectSeatChoiceStyles();
   render();
 
   function initialState() {
@@ -130,11 +131,17 @@
   }
 
   function seatView(key, seats, type, question) {
-    const box = el('div');
+    const box = el('div', `seat-step ${isAvoidKey(key) ? 'seat-step-avoid' : 'seat-step-prefer'}`);
     const desc = type === 'normal'
       ? '실제 교실 구조가 5×5와 완전히 다르더라도, 본인이 생각하는 위치와 가장 가까운 칸을 선택해주세요. A줄은 칠판에 가장 가까운 앞줄, E줄은 가장 뒷줄입니다. 1번은 창가 쪽, 5번은 복도/문 쪽입니다.'
       : '모둠의 위치와 모둠 안의 번호를 함께 고려해 선택해주세요. 각 모둠 안의 좌석은 1, 2, 3, 4로 표시됩니다.';
-    box.innerHTML = `<h2>좌석 선택</h2><p class='question'>${question}</p><p class='seat-help'>${desc}</p>`;
+    const mode = isAvoidKey(key) ? 'avoid' : 'prefer';
+    const title = mode === 'avoid' ? '앉기 싫은 자리 선택' : '앉고 싶은 자리 선택';
+    const modeText = mode === 'avoid'
+      ? '앞 단계에서 앉고 싶은 자리로 고른 좌석은 회색으로 잠기며 다시 선택할 수 없습니다.'
+      : '여기서 고른 좌석은 다음 기피 좌석 단계에서 선택할 수 없도록 잠깁니다.';
+
+    box.innerHTML = `<h2>${title}</h2><div class='seat-mode-banner ${mode}'><strong>${mode === 'avoid' ? '기피 좌석' : '선호 좌석'}</strong><span>${modeText}</span></div><p class='question'>${question}</p><p class='seat-help'>${desc}</p>`;
     box.append(rankChips(state[key]));
     box.append(type === 'normal' ? normalClassroom(key, seats) : groupClassroom(key));
     box.append(button('선택 초기화', 'warning', () => { state[key] = []; render(); }));
@@ -185,15 +192,27 @@
   function seatButton(key, label, value, aria) {
     const selected = state[key];
     const rank = selected.indexOf(value);
-    const btn = el('button', `seat-button ${rank >= 0 ? 'selected' : ''}`, label);
+    const blocked = isBlockedByPrefer(key, value);
+    const btn = el('button', `seat-button ${rank >= 0 ? 'selected' : ''} ${blocked ? 'blocked-by-prefer' : ''}`, label);
     btn.type = 'button';
-    btn.setAttribute('aria-label', `${aria}${rank >= 0 ? `, ${rank + 1}순위 선택됨` : ''}`);
+    btn.setAttribute('aria-label', `${aria}${rank >= 0 ? `, ${rank + 1}순위 선택됨` : ''}${blocked ? ', 선호 좌석이라 기피 좌석에서 선택할 수 없음' : ''}`);
     if (rank >= 0) btn.append(el('span', 'seat-rank', String(rank + 1)));
+    if (blocked) {
+      btn.disabled = true;
+      btn.title = '앞 단계에서 앉고 싶은 자리로 선택한 좌석입니다.';
+      btn.append(el('span', 'blocked-badge', '선호'));
+      return btn;
+    }
     btn.addEventListener('click', () => toggleSeat(key, value));
     return btn;
   }
 
   function toggleSeat(key, value) {
+    if (isBlockedByPrefer(key, value)) {
+      fail('앉고 싶은 자리로 선택한 좌석은 앉기 싫은 자리에서 고를 수 없습니다.');
+      return;
+    }
+
     const selected = state[key];
     const found = selected.indexOf(value);
     if (found >= 0) {
@@ -206,6 +225,7 @@
       return;
     }
     selected.push(value);
+    removeFromPairedAvoid(key, value);
     render();
   }
 
@@ -238,6 +258,7 @@
       if (!/^[0-9 -]+$/.test(state.phone)) return fail('전화번호는 숫자, 하이픈, 공백만 입력할 수 있습니다.');
       if (state.phoneNormalized.length < 10) return fail('전화번호 숫자는 10자리 이상 입력해주세요.');
     }
+    removePreferOverlaps();
     const seatKeys = { 3: 'normalPrefer', 4: 'normalAvoid', 5: 'groupPrefer', 6: 'groupAvoid' };
     if (seatKeys[step] && state[seatKeys[step]].length !== 3) return fail('정확히 3개를 선택해야 다음 단계로 갈 수 있습니다.');
     if (step === 7 && !state.focusScore) return fail('수업 집중도를 선택해주세요.');
@@ -282,6 +303,7 @@
   }
 
   function payload() {
+    removePreferOverlaps();
     return {
       submittedAtClient: new Date().toISOString(),
       privacyConsent: true,
@@ -305,6 +327,28 @@
       focusScore: Number(state.focusScore),
       userAgent: navigator.userAgent,
     };
+  }
+
+  function isAvoidKey(key) {
+    return key === 'normalAvoid' || key === 'groupAvoid';
+  }
+
+  function isBlockedByPrefer(key, value) {
+    if (key === 'normalAvoid') return state.normalPrefer.includes(value);
+    if (key === 'groupAvoid') return state.groupPrefer.includes(value);
+    return false;
+  }
+
+  function removeFromPairedAvoid(key, value) {
+    const paired = key === 'normalPrefer' ? state.normalAvoid : key === 'groupPrefer' ? state.groupAvoid : null;
+    if (!paired) return;
+    const index = paired.indexOf(value);
+    if (index >= 0) paired.splice(index, 1);
+  }
+
+  function removePreferOverlaps() {
+    state.normalAvoid = state.normalAvoid.filter((seat) => !state.normalPrefer.includes(seat));
+    state.groupAvoid = state.groupAvoid.filter((seat) => !state.groupPrefer.includes(seat));
   }
 
   function gradeButtonsField() {
@@ -437,6 +481,107 @@
         .grade-choice {
           min-height: 48px;
           padding-inline: 8px;
+        }
+      }
+    `;
+    document.head.append(style);
+  }
+
+  function injectSeatChoiceStyles() {
+    if (document.getElementById('seat-choice-lock-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'seat-choice-lock-styles';
+    style.textContent = `
+      .seat-step-prefer h2 {
+        color: #0b5d57;
+      }
+
+      .seat-step-avoid h2 {
+        color: #a92727;
+      }
+
+      .seat-mode-banner {
+        display: grid;
+        gap: 4px;
+        margin: 14px 0 12px;
+        padding: 12px 14px;
+        border: 1px solid #c5d0df;
+        border-left-width: 5px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .seat-mode-banner strong {
+        font-weight: 950;
+      }
+
+      .seat-mode-banner span {
+        color: #4f5f75;
+        line-height: 1.5;
+      }
+
+      .seat-mode-banner.prefer {
+        border-left-color: #0f766e;
+        background: linear-gradient(180deg, #f0fbf8, #ffffff);
+      }
+
+      .seat-mode-banner.prefer strong {
+        color: #0b5d57;
+      }
+
+      .seat-mode-banner.avoid {
+        border-left-color: #d83a3a;
+        background: linear-gradient(180deg, #fff3f2, #ffffff);
+      }
+
+      .seat-mode-banner.avoid strong {
+        color: #a92727;
+      }
+
+      .seat-button.blocked-by-prefer,
+      .normal-room .normal-grid .seat-button.blocked-by-prefer,
+      .desk-seat.blocked-by-prefer {
+        border-color: #9aa7b7 !important;
+        border-style: dashed !important;
+        background: linear-gradient(180deg, #eef2f5 0%, #d9e0e8 100%) !important;
+        color: #607086 !important;
+        cursor: not-allowed !important;
+        opacity: 0.82;
+        filter: grayscale(0.45);
+        box-shadow: none !important;
+      }
+
+      .seat-button.blocked-by-prefer:hover,
+      .desk-seat.blocked-by-prefer:hover {
+        transform: none !important;
+      }
+
+      .blocked-badge {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        min-width: 28px;
+        padding: 2px 5px;
+        border-radius: 999px;
+        background: rgba(15, 118, 110, 0.14);
+        color: #0b5d57;
+        font-size: 0.62rem;
+        font-weight: 950;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 520px) {
+        .seat-mode-banner {
+          padding: 10px 11px;
+        }
+
+        .blocked-badge {
+          right: 3px;
+          top: 3px;
+          min-width: 24px;
+          padding: 1px 4px;
+          font-size: 0.55rem;
         }
       }
     `;
