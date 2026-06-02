@@ -9,6 +9,8 @@
   const stepTitle = document.getElementById('stepTitle');
   const progressBar = document.getElementById('progressBar');
 
+  const totalSurveySteps = 7;
+  const completeStep = 8;
   const normalSeats = ['A', 'B', 'C', 'D', 'E'].flatMap((row) => [1, 2, 3, 4, 5].map((col) => `${row}${col}`));
   const groups = [
     ['G1', '앞쪽 왼쪽 모둠'],
@@ -19,11 +21,15 @@
     ['G6', '뒤쪽 오른쪽 모둠'],
   ];
   const groupSeats = groups.flatMap(([group]) => [1, 2, 3, 4].map((seat) => `${group}-${seat}`));
-  const titles = ['', '개인정보 동의', '기본 정보', '일반 교실 선호', '일반 교실 기피', '모둠수업 선호', '모둠수업 기피', '수업 집중도', '제출 전 확인'];
+  const titles = ['', '개인정보 동의', '기본 정보', '일반 교실 선호', '일반 교실 기피', '모둠수업 선호', '모둠수업 기피', '수업 집중도'];
 
   let step = 0;
   let sending = false;
   const state = initialState();
+
+  window.getSeatSurveyPayload = payload;
+  window.validateSeatSurveyBeforeSubmit = () => validate();
+  window.showSeatSurveyComplete = showComplete;
 
   render();
 
@@ -45,12 +51,12 @@
 
   function render() {
     message.textContent = '';
-    const showProgress = step > 0 && step < 9;
+    const showProgress = step > 0 && step <= totalSurveySteps;
     progressWrap.classList.toggle('hidden', !showProgress);
     if (showProgress) {
-      progressText.textContent = `${step} / 9`;
+      progressText.textContent = `${step} / ${totalSurveySteps}`;
       stepTitle.textContent = titles[step];
-      progressBar.style.width = `${Math.min(100, step / 9 * 100)}%`;
+      progressBar.style.width = `${Math.min(100, step / totalSurveySteps * 100)}%`;
     }
     screen.replaceChildren(view());
     actions.replaceChildren(...navButtons());
@@ -65,15 +71,14 @@
     if (step === 5) return seatView('groupPrefer', groupSeats, 'group', '모둠수업 형태에서 가장 앉고 싶은 자리를 순서대로 3개 선택해주세요.');
     if (step === 6) return seatView('groupAvoid', groupSeats, 'group', '모둠수업 형태에서 가장 앉고 싶지 않은 자리를 순서대로 3개 선택해주세요.');
     if (step === 7) return focusView();
-    if (step === 8) return confirmView();
     return completeView();
   }
 
   function navButtons() {
     if (step === 0) return [button('설문 시작하기', 'primary', () => go(1))];
-    if (step === 9) return [button('처음으로 돌아가기', 'primary', resetAll)];
-    if (step === 8) return [
-      button('이전으로 돌아가기', 'secondary', () => go(7)),
+    if (step === completeStep) return [button('처음으로 돌아가기', 'primary', resetAll)];
+    if (step === totalSurveySteps) return [
+      button('이전', 'secondary', () => go(step - 1)),
       button(sending ? '제출 중...' : '제출하기', 'primary', submit, sending),
     ];
     return [
@@ -94,21 +99,13 @@
 
   function startView() {
     const box = el('div');
-    box.innerHTML = `<p class='eyebrow'>제28회 전국학생통계활용대회</p><h1>교실에도 명당이 있을까?</h1><p class='lead'>좌석 위치와 수업 집중도에 관한 설문</p><p class='notice'>본 설문은 제28회 전국학생통계활용대회 출품작 연구를 위한 설문입니다. 응답 내용은 좌석 위치와 수업 집중도에 대한 통계 분석 및 통계포스터 제작 목적으로 사용됩니다. 설문 소요 시간은 약 1~2분입니다.</p>`;
+    box.innerHTML = `<p class='eyebrow'>제28회 전국학생통계활용대회</p><h1>교실에도 명당이 있을까?</h1><p class='lead'>좌석 위치와 수업 집중도에 관한 설문</p><p class='notice'>본 설문은 제28회 전국학생통계활용대회 출품작 연구를 위한 설문입니다. 응답 내용은 좌석 위치와 수업 집중도에 대한 통계 분석 및 통계포스터 제작 목적으로 사용됩니다. 설문 소요 시간은 약 1분입니다.</p>`;
     return box;
   }
 
   function privacyView() {
     const box = el('div');
-    box.innerHTML = `<h2>개인정보 수집 및 이용 동의</h2><p class='notice'>본 설문조사는 ‘제28회 전국학생통계활용대회’ 출품작 연구를 목적으로 진행됩니다. 응답해주신 내용은 통계 분석 목적으로만 사용되며, 대회 종료 및 결과 발표 후 파기됩니다.
-
-수집 항목: 이름, 학년, 소속, 전화번호, 좌석 선호 및 기피 응답, 수업 집중도 응답
-
-수집 목적: 전국학생통계활용대회 참가를 위한 데이터 수집, 중복 응답 확인, 상품 지급 및 연락
-
-보유 기간: 대회 종료 및 결과 발표 시까지
-
-※ 귀하는 본 동의를 거부할 권리가 있으며, 거부 시 설문 참여가 제한될 수 있습니다.</p><p class='question'>개인정보 수집 및 이용에 동의하십니까?</p>`;
+    box.innerHTML = `<h2>개인정보 수집 및 이용 동의</h2><p class='notice'>본 설문조사는 ‘제28회 전국학생통계활용대회’ 출품작 연구를 목적으로 진행됩니다. 응답해주신 내용은 통계 분석 목적으로만 사용되며, 대회 종료 및 결과 발표 후 파기됩니다.\n\n수집 항목: 이름, 학년, 소속, 전화번호, 좌석 선호 및 기피 응답, 수업 집중도 응답\n\n수집 목적: 전국학생통계활용대회 참가를 위한 데이터 수집, 중복 응답 확인, 상품 지급 및 연락\n\n보유 기간: 대회 종료 및 결과 발표 시까지\n\n※ 귀하는 본 동의를 거부할 권리가 있으며, 거부 시 설문 참여가 제한될 수 있습니다.</p><p class='question'>개인정보 수집 및 이용에 동의하십니까?</p>`;
     box.append(choices('privacyConsent', [
       ['agree', '동의합니다', true],
       ['disagree', '동의하지 않습니다', false],
@@ -220,29 +217,6 @@
     return box;
   }
 
-  function confirmView() {
-    const box = el('div');
-    box.innerHTML = `<h2>제출 전 확인</h2><p class='notice'>입력한 정보가 정확한지 확인해주세요. 제출 후 수정이 어려울 수 있습니다.</p>`;
-    const table = el('table', 'summary-table');
-    const body = el('tbody');
-    [
-      ['소속', state.affiliation], ['이름', state.name], ['학년', state.grade], ['전화번호', state.phone],
-      ['일반 교실 앉고 싶은 자리 1~3순위', state.normalPrefer.join(' > ')],
-      ['일반 교실 앉고 싶지 않은 자리 1~3순위', state.normalAvoid.join(' > ')],
-      ['모둠수업 앉고 싶은 자리 1~3순위', state.groupPrefer.join(' > ')],
-      ['모둠수업 앉고 싶지 않은 자리 1~3순위', state.groupAvoid.join(' > ')],
-      ['자신의 수업 집중도', `${state.focusScore}점`],
-    ].forEach(([label, value]) => {
-      const row = el('tr');
-      row.append(el('th', '', label));
-      row.append(el('td', '', value));
-      body.append(row);
-    });
-    table.append(body);
-    box.append(table);
-    return box;
-  }
-
   function completeView() {
     const box = el('div', 'complete');
     box.innerHTML = `<div class='complete-mark' aria-hidden='true'>✓</div><h2>응답이 저장되었습니다.</h2><p class='lead'>설문에 참여해주셔서 감사합니다.</p>`;
@@ -270,6 +244,7 @@
   }
 
   async function submit() {
+    if (!validate()) return;
     const url = typeof SCRIPT_URL === 'string' ? SCRIPT_URL.trim() : '';
     if (!url) return fail('관리자 설정이 완료되지 않았습니다. SCRIPT_URL을 설정해주세요.');
     sending = true;
@@ -286,15 +261,23 @@
       try { result = text ? JSON.parse(text) : null; } catch (error) { result = null; }
       if (result && result.duplicate) return fail('이미 제출된 전화번호입니다. 중복 응답은 제출할 수 없습니다.');
       if (!response.ok || (result && result.ok === false)) return fail('응답 저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
-      Object.assign(state, initialState());
-      step = 9;
-      render();
+      showComplete();
     } catch (error) {
       fail('응답 저장 중 문제가 발생했습니다. 네트워크 상태 또는 SCRIPT_URL 설정을 확인해주세요.');
     } finally {
       sending = false;
-      if (step === 8) render();
+      if (step === totalSurveySteps) {
+        const currentMessage = message.textContent;
+        render();
+        if (currentMessage) fail(currentMessage);
+      }
     }
+  }
+
+  function showComplete() {
+    Object.assign(state, initialState());
+    step = completeStep;
+    render();
   }
 
   function payload() {
