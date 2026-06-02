@@ -31,6 +31,7 @@
   window.validateSeatSurveyBeforeSubmit = () => validate();
   window.showSeatSurveyComplete = showComplete;
 
+  injectGradeButtonStyles();
   render();
 
   function initialState() {
@@ -122,7 +123,7 @@
     const grid = el('div', 'field-grid two');
     grid.append(textField('affiliation', '소속', '소속을 입력해주세요.', '예: 경기고등학교'));
     grid.append(textField('name', '이름', '이름을 입력해주세요.', '예: 홍길동'));
-    grid.append(selectField('grade', '학년', '학년을 선택해주세요.', ['1학년', '2학년', '3학년']));
+    grid.append(gradeButtonsField());
     grid.append(textField('phone', '전화번호', '전화번호를 입력해주세요.', '010-1234-5678', 'tel', '상품 지급 및 중복 응답 확인 목적으로만 사용됩니다.'));
     box.append(grid);
     return box;
@@ -306,6 +307,27 @@
     };
   }
 
+  function gradeButtonsField() {
+    const field = el('div', 'field grade-field');
+    field.append(labelFor('grade-choice-1', '학년'));
+    field.append(el('p', 'hint', '학년을 선택해주세요.'));
+
+    const row = el('div', 'grade-button-row');
+    ['1학년', '2학년', '3학년'].forEach((value, index) => {
+      const selected = state.grade === value;
+      const gradeButton = button(value, `${selected ? 'primary' : 'secondary'} grade-choice`, () => {
+        state.grade = value;
+        render();
+      });
+      gradeButton.id = `grade-choice-${index + 1}`;
+      gradeButton.setAttribute('aria-pressed', String(selected));
+      row.append(gradeButton);
+    });
+
+    field.append(row);
+    return field;
+  }
+
   function textField(id, label, question, placeholder, type = 'text', hint = '') {
     const field = el('div', 'field');
     field.append(labelFor(id, label));
@@ -324,22 +346,6 @@
       if (id === 'phone') state.phoneNormalized = normalizePhone(input.value);
     });
     field.append(input);
-    return field;
-  }
-
-  function selectField(id, label, question, values) {
-    const field = el('div', 'field');
-    field.append(labelFor(id, label));
-    field.append(el('p', 'hint', question));
-    const select = el('select');
-    select.id = id;
-    select.name = id;
-    select.required = true;
-    select.append(new Option('선택해주세요', ''));
-    values.forEach((value) => select.append(new Option(value, value)));
-    select.value = state[id];
-    select.addEventListener('change', () => { state[id] = select.value; });
-    field.append(select);
     return field;
   }
 
@@ -393,5 +399,40 @@
   function resetAll() {
     Object.assign(state, initialState());
     go(0);
+  }
+
+  function injectGradeButtonStyles() {
+    if (document.getElementById('grade-button-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'grade-button-styles';
+    style.textContent = `
+      .grade-button-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .grade-choice {
+        width: 100%;
+        min-height: 50px;
+      }
+
+      .grade-choice[aria-pressed="true"] {
+        border-color: var(--primary-dark);
+      }
+
+      @media (max-width: 420px) {
+        .grade-button-row {
+          gap: 6px;
+        }
+
+        .grade-choice {
+          min-height: 48px;
+          padding-inline: 8px;
+        }
+      }
+    `;
+    document.head.append(style);
   }
 })();
