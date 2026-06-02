@@ -317,9 +317,16 @@
       const selected = state.grade === value;
       const gradeButton = button(value, `${selected ? 'primary' : 'secondary'} grade-choice`, () => {
         state.grade = value;
-        render();
+        message.textContent = '';
+        row.querySelectorAll('.grade-choice').forEach((buttonNode) => {
+          const active = buttonNode.dataset.gradeValue === value;
+          buttonNode.classList.toggle('primary', active);
+          buttonNode.classList.toggle('secondary', !active);
+          buttonNode.setAttribute('aria-pressed', String(active));
+        });
       });
       gradeButton.id = `grade-choice-${index + 1}`;
+      gradeButton.dataset.gradeValue = value;
       gradeButton.setAttribute('aria-pressed', String(selected));
       row.append(gradeButton);
     });
