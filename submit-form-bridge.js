@@ -5,9 +5,16 @@
     const button = event.target.closest('button');
     if (!button || button.textContent.trim() !== '제출하기') return;
 
+    const canUseBridge = document.querySelector('.summary-table') || typeof window.getSeatSurveyPayload === 'function';
+    if (!canUseBridge) return;
+
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
+
+    if (typeof window.validateSeatSurveyBeforeSubmit === 'function' && !window.validateSeatSurveyBeforeSubmit()) {
+      return;
+    }
 
     submitWithFormBridge(button);
   }, true);
@@ -26,13 +33,24 @@
     message.textContent = '';
 
     try {
-      await postForm(scriptUrl, buildPayloadFromSummary());
-      showCompleteScreen();
+      await postForm(scriptUrl, buildPayload());
+      if (typeof window.showSeatSurveyComplete === 'function') {
+        window.showSeatSurveyComplete();
+      } else {
+        showCompleteScreen();
+      }
     } catch (error) {
       button.disabled = false;
       button.textContent = '제출하기';
       message.textContent = '응답 저장 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
     }
+  }
+
+  function buildPayload() {
+    if (typeof window.getSeatSurveyPayload === 'function') {
+      return window.getSeatSurveyPayload();
+    }
+    return buildPayloadFromSummary();
   }
 
   function buildPayloadFromSummary() {
@@ -97,7 +115,7 @@
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = key;
-        input.value = String(value);
+        input.value = String(value ?? '');
         form.append(input);
       });
 
