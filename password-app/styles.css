@@ -1,0 +1,213 @@
+:root {
+  color-scheme: light;
+  font-family:
+    Pretendard, "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+  --ink: #17202a;
+  --muted: #667085;
+  --paper: #fffdf8;
+  --line: #d9dee7;
+  --accent: #136f63;
+  --accent-dark: #0d4e46;
+  --danger: #c24132;
+  --gold: #f3b23a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top left, rgba(243, 178, 58, 0.22), transparent 30rem),
+    linear-gradient(135deg, #f8fbff 0%, #fffdf8 48%, #edf7f5 100%);
+  color: var(--ink);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app {
+  width: min(92vw, 25rem);
+}
+
+.scene {
+  min-height: 31rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 1.5rem 4rem rgba(23, 32, 42, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.hidden {
+  display: none;
+}
+
+.lock-art {
+  position: relative;
+  width: 7.5rem;
+  height: 8.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.lock-shackle {
+  position: absolute;
+  left: 1.7rem;
+  top: 0;
+  width: 4.1rem;
+  height: 4.6rem;
+  border: 0.72rem solid var(--accent);
+  border-bottom: 0;
+  border-radius: 3rem 3rem 0 0;
+}
+
+.lock-body {
+  position: absolute;
+  left: 0.5rem;
+  right: 0.5rem;
+  bottom: 0;
+  height: 5rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent) 0%, #259486 100%);
+  box-shadow: inset 0 -0.45rem 0 rgba(0, 0, 0, 0.16);
+}
+
+.lock-dot {
+  position: absolute;
+  left: 50%;
+  bottom: 1.75rem;
+  width: 1rem;
+  height: 1rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--gold);
+  box-shadow: 0 1.1rem 0 -0.25rem var(--gold);
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.hint {
+  color: var(--muted);
+}
+
+form {
+  width: 100%;
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.pin-inputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.pin-inputs input {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+  font-size: clamp(1.5rem, 9vw, 2.1rem);
+  font-weight: 700;
+  outline: 0;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.pin-inputs input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(19, 111, 99, 0.16);
+  transform: translateY(-1px);
+}
+
+.message {
+  min-height: 1.5rem;
+  color: var(--danger);
+  text-align: center;
+  font-weight: 700;
+}
+
+button {
+  min-height: 3rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+  box-shadow: 0 0.75rem 1.5rem rgba(19, 111, 99, 0.2);
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+button:hover {
+  background: var(--accent-dark);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.success-screen {
+  text-align: center;
+}
+
+.success-mark {
+  width: 6.5rem;
+  height: 6.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: #dff4ef;
+  color: var(--accent);
+  font-size: 4rem;
+  font-weight: 900;
+}
+
+.success-screen p {
+  color: var(--muted);
+}
+
+.success-screen button {
+  width: 100%;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 360px) {
+  .scene {
+    padding: 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+}
