@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4자리 비밀번호</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app" aria-live="polite">
+      <section class="scene" id="lock-screen">
+        <div class="lock-art" aria-hidden="true">
+          <span class="lock-shackle"></span>
+          <span class="lock-body"></span>
+          <span class="lock-dot"></span>
+        </div>
+
+        <h1>비밀번호 입력</h1>
+        <p class="hint">4자리 숫자를 입력하세요</p>
+
+        <form id="pin-form" autocomplete="off">
+          <div class="pin-inputs" role="group" aria-label="4자리 비밀번호">
+            <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="첫 번째 숫자" />
+            <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="두 번째 숫자" />
+            <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="세 번째 숫자" />
+            <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="네 번째 숫자" />
+          </div>
+
+          <p class="message" id="message"></p>
+          <button type="submit">확인</button>
+        </form>
+      </section>
+
+      <section class="scene success-screen hidden" id="success-screen">
+        <div class="success-mark" aria-hidden="true">✓</div>
+        <h1>다음 화면</h1>
+        <p>비밀번호가 맞았습니다.</p>
+        <button type="button" id="reset-button">처음으로</button>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
