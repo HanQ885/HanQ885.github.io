@@ -1,4 +1,4 @@
-const CORRECT_PIN = "5376";
+const PIN_CHECK = "1cea97c28cd639e0f3307fdb53660175e9e838ff799211075128e63060eb93eb";
 
 const form = document.querySelector("#pin-form");
 const inputs = Array.from(document.querySelectorAll(".pin-inputs input"));
@@ -6,8 +6,29 @@ const message = document.querySelector("#message");
 const lockScreen = document.querySelector("#lock-screen");
 const successScreen = document.querySelector("#success-screen");
 const resetButton = document.querySelector("#reset-button");
+const submitButton = form.querySelector("button");
+const encoder = new TextEncoder();
 
 const getPin = () => inputs.map((input) => input.value).join("");
+
+const hashPin = async (pin) => {
+  const digest = await crypto.subtle.digest("SHA-256", encoder.encode(pin));
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+};
+
+const stringsMatch = (left, right) => {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  let difference = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    difference |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return difference === 0;
+};
 
 const clearPin = () => {
   inputs.forEach((input) => {
@@ -33,10 +54,15 @@ inputs.forEach((input, index) => {
   });
 });
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  submitButton.disabled = true;
+  message.textContent = "";
 
-  if (getPin() === CORRECT_PIN) {
+  const candidate = await hashPin(getPin());
+  submitButton.disabled = false;
+
+  if (stringsMatch(candidate, PIN_CHECK)) {
     lockScreen.classList.add("hidden");
     successScreen.classList.remove("hidden");
     resetButton.focus();
