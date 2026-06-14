@@ -4,11 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Voca Practice</title>
-    <script>
-      window.VOCA_ASSET_BASE = "https://cdn.jsdelivr.net/gh/HanQ885/voca@4697d472183dadf93d2d01cbb13f21df4e6f4855/";
-      document.write('<link rel="stylesheet" href="' + window.VOCA_ASSET_BASE + 'styles.css" />');
-      document.write('<link rel="stylesheet" href="' + window.VOCA_ASSET_BASE + 'exam.css" />');
-    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HanQ885/voca@4697d472183dadf93d2d01cbb13f21df4e6f4855/styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HanQ885/voca@4697d472183dadf93d2d01cbb13f21df4e6f4855/exam.css" />
   </head>
   <body>
     <header class="app-header">
@@ -87,7 +84,8 @@
     </main>
 
     <script>
-      [
+      const VOCA_ASSET_BASE = "https://cdn.jsdelivr.net/gh/HanQ885/voca@4697d472183dadf93d2d01cbb13f21df4e6f4855/";
+      const VOCA_FILES = [
         "data/voca-compressed-chunk-00.js",
         "data/voca-compressed-chunk-01.js",
         "data/voca-compressed-chunk-02.js",
@@ -107,9 +105,27 @@
         "app-chunk-03.js",
         "exam-patch.js",
         "app.js"
-      ].forEach((file) => {
-        document.write('<script src="' + window.VOCA_ASSET_BASE + file + '"><\/script>');
-      });
+      ];
+
+      function loadVocaScript(file) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = VOCA_ASSET_BASE + file;
+          script.onload = resolve;
+          script.onerror = () => reject(new Error(file + " 로딩 실패"));
+          document.body.appendChild(script);
+        });
+      }
+
+      (async () => {
+        try {
+          for (const file of VOCA_FILES) await loadVocaScript(file);
+        } catch (error) {
+          console.error(error);
+          const prompt = document.querySelector("#questionPrompt");
+          if (prompt) prompt.textContent = "데이터를 불러오지 못했습니다.";
+        }
+      })();
     </script>
   </body>
 </html>
