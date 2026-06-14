@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Voca Practice</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/styles.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/exam.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Vocabulary Performance</p>
+        <h1>Voca Practice</h1>
+      </div>
+      <div class="header-actions">
+        <button id="shuffleBtn" class="ghost-btn" type="button">섞기</button>
+        <button id="resetBtn" class="ghost-btn danger" type="button">오답 초기화</button>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="summary-grid" aria-label="요약">
+        <div class="metric"><span>단어</span><strong id="termCount">0</strong></div>
+        <div class="metric"><span>예문</span><strong id="exampleCount">0</strong></div>
+        <div class="metric"><span>문제</span><strong id="questionCount">0</strong></div>
+        <div class="metric warn"><span>오답</span><strong id="wrongCount">0</strong></div>
+      </section>
+
+      <nav class="tabs" aria-label="유형">
+        <button class="tab active" type="button" data-task="task1">Task 1</button>
+        <button class="tab" type="button" data-task="task2">Task 2</button>
+        <button class="tab" type="button" data-task="task3">Task 3</button>
+        <button class="tab" type="button" data-task="task4">Task 4</button>
+        <button class="tab" type="button" data-task="wrong">오답</button>
+      </nav>
+
+      <section class="controls" aria-label="필터">
+        <div class="segmented" id="partFilter">
+          <button class="segment active" type="button" data-part="all">전체</button>
+          <button class="segment" type="button" data-part="Part 1">Part 1</button>
+          <button class="segment" type="button" data-part="Part 2">Part 2</button>
+          <button class="segment" type="button" data-part="Part 3">Part 3</button>
+          <button class="segment" type="button" data-part="Part 4">Part 4</button>
+        </div>
+        <label class="toggle"><input id="wrongOnlyToggle" type="checkbox" /><span>오답만</span></label>
+      </section>
+
+      <section id="practiceView" class="practice">
+        <div class="question-head">
+          <div class="task-title-row">
+            <span id="taskLabel" class="pill">Task 1</span>
+            <p id="instruction" class="instruction"></p>
+            <span id="partLabel" class="pill muted">전체</span>
+          </div>
+          <div class="progress"><span id="questionIndex">0</span><span>/</span><span id="questionTotal">0</span></div>
+        </div>
+
+        <article id="questionPanel" class="question-panel">
+          <div id="koreanPrompt" class="korean-prompt hidden"></div>
+          <div class="question-line">
+            <span id="questionNo" class="question-no"></span>
+            <h2 id="questionPrompt" class="question-prompt"></h2>
+          </div>
+          <div id="choiceArea" class="choices"></div>
+          <form id="inputArea" class="answer-form hidden">
+            <input id="answerInput" type="text" autocomplete="off" spellcheck="false" />
+            <button class="primary-btn" type="submit">채점</button>
+          </form>
+          <div id="feedback" class="feedback hidden" role="status"></div>
+        </article>
+
+        <div class="nav-row">
+          <button id="prevBtn" class="secondary-btn" type="button">이전</button>
+          <button id="showAnswerBtn" class="secondary-btn" type="button">정답 보기</button>
+          <button id="nextBtn" class="primary-btn" type="button">다음</button>
+        </div>
+      </section>
+
+      <section id="wrongView" class="wrong-view hidden">
+        <div class="wrong-head"><h2>오답</h2><span id="wrongSummary">0개</span></div>
+        <div id="wrongList" class="wrong-list"></div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-00.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-01.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-02.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-03.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-04.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-05.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-06.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-07.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-08.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-09.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-10.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-data.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-targets.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-00.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-01.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-02.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-03.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/exam-patch.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app.js"></script>
+  </body>
+</html>
