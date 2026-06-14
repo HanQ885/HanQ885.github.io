@@ -99,18 +99,20 @@
         "data/voca-compressed-chunk-10.js",
         "data/voca-data.js",
         "data/voca-targets.js",
+        "local:part2-target-fix.js",
         "app-chunk-00.js",
         "app-chunk-01.js",
         "app-chunk-02.js",
         "app-chunk-03.js",
         "exam-patch.js",
+        "local:review-patch.js",
         "app.js"
       ];
 
       function loadVocaScript(file) {
         return new Promise((resolve, reject) => {
           const script = document.createElement("script");
-          script.src = VOCA_ASSET_BASE + file;
+          script.src = file.startsWith("local:") ? file.slice("local:".length) : VOCA_ASSET_BASE + file;
           script.onload = resolve;
           script.onerror = () => reject(new Error(file + " 로딩 실패"));
           document.body.appendChild(script);
