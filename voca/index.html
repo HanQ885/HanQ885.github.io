@@ -4,8 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Voca Practice</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/styles.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/exam.css" />
+    <script>
+      window.VOCA_ASSET_BASE = "https://cdn.jsdelivr.net/gh/HanQ885/voca@4697d472183dadf93d2d01cbb13f21df4e6f4855/";
+      document.write('<link rel="stylesheet" href="' + window.VOCA_ASSET_BASE + 'styles.css" />');
+      document.write('<link rel="stylesheet" href="' + window.VOCA_ASSET_BASE + 'exam.css" />');
+    </script>
   </head>
   <body>
     <header class="app-header">
@@ -83,24 +86,30 @@
       </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-00.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-01.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-02.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-03.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-04.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-05.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-06.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-07.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-08.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-09.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-compressed-chunk-10.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-data.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/data/voca-targets.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-00.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-01.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-02.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app-chunk-03.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/exam-patch.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/HanQ885/voca@02e2d2fb31b1623a264e75be5270c8d8af2b4d62/app.js"></script>
+    <script>
+      [
+        "data/voca-compressed-chunk-00.js",
+        "data/voca-compressed-chunk-01.js",
+        "data/voca-compressed-chunk-02.js",
+        "data/voca-compressed-chunk-03.js",
+        "data/voca-compressed-chunk-04.js",
+        "data/voca-compressed-chunk-05.js",
+        "data/voca-compressed-chunk-06.js",
+        "data/voca-compressed-chunk-07.js",
+        "data/voca-compressed-chunk-08.js",
+        "data/voca-compressed-chunk-09.js",
+        "data/voca-compressed-chunk-10.js",
+        "data/voca-data.js",
+        "data/voca-targets.js",
+        "app-chunk-00.js",
+        "app-chunk-01.js",
+        "app-chunk-02.js",
+        "app-chunk-03.js",
+        "exam-patch.js",
+        "app.js"
+      ].forEach((file) => {
+        document.write('<script src="' + window.VOCA_ASSET_BASE + file + '"><\/script>');
+      });
+    </script>
   </body>
 </html>
