@@ -13,7 +13,7 @@ window.VOCA_DATA_READY = Promise.resolve(window.VOCA_DATA_READY).then(() => {
       id: "term-extra-nudge",
       part: "Part 1",
       term: "nudge",
-      meaning: "[\uB3D9] \uCFFC \uCC0C\uB974\uB2E4",
+      meaning: "[\uB3D9] \uCFE1 \uCC0C\uB974\uB2E4",
     },
   ];
 
